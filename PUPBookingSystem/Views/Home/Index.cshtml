@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Welcome";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0B0F19] relative overflow-x-hidden">
+
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-yellow-500/5 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/5 rounded-full blur-[120px]"></div>
+    </div>
+
+    <nav class="relative z-20 w-full px-6 py-6 flex items-center justify-between max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-red-800 flex items-center justify-center border border-yellow-500">
+                <span class="text-yellow-500 font-bold text-xs">PUP</span>
+            </div>
+            <span class="font-bold text-white text-lg tracking-tight">PUP Labs</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm font-medium">
+            <a href="/Account/Login" class="text-slate-400 hover:text-white transition-colors">Login</a>
+            <a href="/Account/Register" class="px-5 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-bold transition-all shadow-lg shadow-yellow-500/20">
+                Register
+            </a>
+        </div>
+    </nav>
+
+    <div class="flex-1 flex items-center justify-center relative z-10 px-6">
+        <div class="w-full max-w-7xl grid lg:grid-cols-2 gap-16 items-center">
+
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs font-semibold uppercase tracking-wide">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                    PUP South Wing Laboratory
+                </div>
+
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-[1.1] text-white">
+                    Book Lab Rooms <br />
+                    with <span class="text-yellow-500">Confidence</span>
+                </h1>
+
+                <p class="text-slate-400 text-lg leading-relaxed max-w-lg">
+                    Reserve rooms S501–S512 for your organization events, lectures, and meetings.
+                    Real-time availability, instant approvals, and seamless scheduling.
+                </p>
+
+                <div class="flex flex-wrap gap-4 pt-2">
+                    <a href="/Booking" class="group px-8 py-4 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-lg transition-all shadow-[0_0_20px_rgba(234,179,8,0.2)] hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] flex items-center gap-2">
+                        Browse Rooms <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
+                    </a>
+                    <a href="/Account/Login" class="px-8 py-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-lg border border-slate-700 transition-all flex items-center gap-2">
+                        <i data-lucide="lock" class="w-5 h-5 text-slate-400"></i> Sign In
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-3 gap-8 pt-12 border-t border-slate-800/50 max-w-lg">
+                    <div>
+                        <h3 class="text-3xl font-bold text-yellow-500">12</h3>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Lab Rooms</p>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-red-500">24/7</h3>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Access Hours</p>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-bold text-yellow-500">100%</h3>
+                        <p class="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">Uptime</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hidden lg:block relative">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+                <div class="bg-[#131722] border border-slate-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-8 border-b border-slate-800/50 pb-4">
+                        <div class="text-xs font-mono text-slate-500">Room Status Dashboard</div>
+                        <div class="flex gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-yellow-500/5 border border-yellow-500/30 relative group">
+                            <div class="text-yellow-500 font-bold mb-1">S501</div>
+                            <div class="h-2 w-12 bg-yellow-500/20 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-yellow-500/10 rounded"></div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-800/30 border border-slate-800">
+                            <div class="text-slate-600 font-bold mb-1">S502</div>
+                            <div class="h-2 w-12 bg-slate-800 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-slate-800 rounded"></div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-800/30 border border-slate-800">
+                            <div class="text-slate-600 font-bold mb-1">S503</div>
+                            <div class="h-2 w-12 bg-slate-800 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-slate-800 rounded"></div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-yellow-500/5 border border-yellow-500/30 relative opacity-50">
+                            <div class="text-yellow-600 font-bold mb-1">S504</div>
+                            <div class="h-2 w-12 bg-yellow-900/20 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-yellow-900/10 rounded"></div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-yellow-500/5 border border-yellow-500/30 relative">
+                            <div class="text-yellow-600 font-bold mb-1">S507</div>
+                            <div class="h-2 w-12 bg-yellow-900/20 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-yellow-900/10 rounded"></div>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-800/30 border border-slate-800">
+                            <div class="text-slate-600 font-bold mb-1">S508</div>
+                            <div class="h-2 w-12 bg-slate-800 rounded mb-2"></div>
+                            <div class="h-2 w-20 bg-slate-800 rounded"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-between items-center pt-4 border-t border-slate-800/50">
+                        <div class="text-[10px] text-slate-500">Available</div>
+                        <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

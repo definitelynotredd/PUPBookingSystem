@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[#0B0F19] relative">
+
+    <div class="w-full max-w-md p-6">
+        <a href="/" class="flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors text-sm font-medium">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to home
+        </a>
+
+        <div class="bg-[#131722] border border-slate-800 rounded-2xl p-8 shadow-2xl">
+
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+                <p class="text-slate-400">Sign in to your PUP Lab account</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="mb-6 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i> @ViewBag.Error
+                </div>
+            }
+
+            <form action="/Account/Login" method="post" class="space-y-5">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2">Email Address</label>
+                    <input type="email" name="email" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="you@pup.edu.ph" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2">Password</label>
+                    <input type="password" name="password" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="••••••••" />
+                </div>
+
+                <div class="flex items-center justify-between text-sm">
+                    <label class="flex items-center gap-2 text-slate-400 cursor-pointer hover:text-slate-300">
+                        <input type="checkbox" class="rounded bg-slate-800 border-slate-700 text-yellow-500 focus:ring-0" />
+                        Remember me
+                    </label>
+                    <a href="#" class="text-yellow-500 hover:text-yellow-400 font-medium">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-lg bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-500 hover:to-red-500 text-white font-bold text-sm transition-all shadow-lg shadow-orange-900/20 mt-2">
+                    Sign In
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-slate-500 text-sm">
+                Don't have an account? <a href="/Account/Register" class="text-yellow-500 hover:text-yellow-400 font-bold transition-colors">Create one</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

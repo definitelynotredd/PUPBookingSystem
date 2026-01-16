@@ -1,0 +1,165 @@
+﻿@model IEnumerable<PUPBookingSystem.Models.BookingRequest>
+@{
+    Layout = null;
+
+    // 1. Calculate Stats Dynamically
+    var totalRequests = Model.Count();
+    var approvedCount = Model.Count(r => r.Status == "Approved");
+    var pendingCount = Model.Count(r => r.Status == "Pending");
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Bookings - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-[#0B0F19] to-slate-900/20">
+
+    <nav class="sticky top-0 z-40 border-b border-slate-800/40 backdrop-blur-xl bg-[#0B0F19]/80">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/Booking" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-medium">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Back
+            </a>
+            <h1 class="text-lg font-bold text-white">My Bookings</h1>
+            <div class="flex items-center gap-3">
+                <a href="/Booking" class="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm transition-all flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> New Request
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-8">
+            <h2 class="text-4xl font-bold mb-3 text-white">My Booking Requests</h2>
+            <p class="text-slate-400 text-lg">Track and manage your lab room reservations</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-12">
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <p class="text-slate-500 text-sm font-medium mb-1">Total Requests</p>
+                <h3 class="text-4xl font-bold text-white">@totalRequests</h3>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <p class="text-slate-500 text-sm font-medium mb-1">Approved</p>
+                <h3 class="text-4xl font-bold text-yellow-500">@approvedCount</h3>
+            </div>
+
+            <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6">
+                <p class="text-slate-500 text-sm font-medium mb-1">Pending</p>
+                <h3 class="text-4xl font-bold text-yellow-500">@pendingCount</h3>
+            </div>
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="text-center py-20 bg-slate-900/50 border border-slate-800 rounded-xl">
+                <div class="bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="calendar-off" class="w-8 h-8 text-slate-500"></i>
+                </div>
+                <h3 class="text-white font-bold text-lg mb-1">No bookings found</h3>
+                <p class="text-slate-500 mb-6">You haven't made any lab reservations yet.</p>
+                <a href="/Booking" class="text-yellow-500 hover:text-yellow-400 font-medium text-sm">Book a Room &rarr;</a>
+            </div>
+        }
+        else
+        {
+            <div class="space-y-6">
+                @foreach (var item in Model)
+                {
+                    // Dynamic Badge Logic
+                    var badgeClass = "bg-slate-500/10 text-slate-400 border-slate-500/30";
+                    if (item.Status == "Approved") { badgeClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"; }
+                    else if (item.Status == "Pending") { badgeClass = "bg-yellow-500/10 text-yellow-500 border-yellow-500/30"; }
+                    else if (item.Status == "Rejected") { badgeClass = "bg-red-500/10 text-red-400 border-red-500/30"; }
+
+                    <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 hover:border-yellow-500/40 transition-all">
+
+                        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mb-6">
+                            <div>
+                                <h3 class="text-2xl font-bold mb-2 text-white">@item.Purpose</h3>
+                                <p class="text-sm text-slate-400">
+                                    Confirmation: <span class="font-mono text-slate-300">PUP-2026-@item.Id.ToString("D3")</span>
+                                </p>
+                            </div>
+                            <div class="px-4 py-2 rounded-full text-sm font-semibold border @badgeClass">
+                                @item.Status
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-yellow-500"></i>
+                                    <div>
+                                        <p class="text-sm text-slate-500">Room</p>
+                                        <p class="font-semibold text-white">@(item.Room?.Code ?? "Unknown")</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="calendar" class="w-5 h-5 text-yellow-500"></i>
+                                    <div>
+                                        <p class="text-sm text-slate-500">Date</p>
+                                        <p class="font-semibold text-white">
+                                            @item.Date.ToString("dddd, MMMM dd, yyyy")
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="clock" class="w-5 h-5 text-yellow-500"></i>
+                                    <div>
+                                        <p class="text-sm text-slate-500">Time</p>
+                                        <p class="font-semibold text-white">
+                                            @DateTime.Today.Add(item.StartTime).ToString("hh:mm tt") -
+                                            @DateTime.Today.Add(item.EndTime).ToString("hh:mm tt")
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="users" class="w-5 h-5 text-yellow-500"></i>
+                                    <div>
+                                        <p class="text-sm text-slate-500">Attendees</p>
+                                        <p class="font-semibold text-white">@item.Attendees people</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-slate-800 flex gap-3">
+                            
+
+                            @if (item.Status == "Pending")
+                            {
+                                <form asp-action="Cancel" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to cancel?');">
+                                    <button type="submit" class="px-4 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 font-medium transition-all text-sm border border-red-500/30 flex items-center gap-2">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i> Cancel Booking
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

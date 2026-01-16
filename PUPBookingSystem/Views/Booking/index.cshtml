@@ -1,0 +1,237 @@
+﻿@model IEnumerable<Room>
+@{
+    Layout = null; // Using standalone layout to match the specific screenshot design
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Available Rooms - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+        /* Smooth fade for filtering */
+        .room-card {
+            transition: all 0.3s ease;
+        }
+
+        .hidden-card {
+            display: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#0B0F19] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-[#0B0F19] to-[#0B0F19]">
+
+    <nav class="sticky top-0 z-40 border-b border-slate-800/60 backdrop-blur-xl bg-[#0B0F19]/80 h-16 flex items-center">
+        <div class="max-w-7xl mx-auto px-4 w-full flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 text-slate-200 hover:text-white transition-colors font-bold text-lg">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> PUP Labs
+            </a>
+
+            <div class="flex items-center gap-4">
+                <a href="/Booking/MyRequests" class="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm transition-all shadow-lg shadow-yellow-500/20">
+                    My Requests
+                </a>
+
+                <a href="/Account/Logout" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-red-500/10 border border-transparent hover:border-red-500/20">
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Log Out
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <div class="mb-10">
+            <h1 class="text-4xl font-bold mb-3 text-white">Available Lab Rooms</h1>
+            <p class="text-slate-400 text-lg">South Wing 5th Floor • Rooms S501 to S512</p>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mb-10">
+            <div class="relative flex-1">
+                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500"></i>
+                <input type="text" id="searchInput" placeholder="Search room code..."
+                       class="w-full pl-10 pr-4 py-3 rounded-lg bg-slate-900/50 border border-slate-800 text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-600 transition-all" />
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="filterRooms('all')" id="btn-all" class="filter-btn px-6 py-3 rounded-lg bg-yellow-500 text-black font-bold text-sm transition-all hover:opacity-90">
+                    <i data-lucide="filter" class="w-4 h-4 inline mr-2"></i> All
+                </button>
+                <button onclick="filterRooms('Available')" id="btn-available" class="filter-btn px-6 py-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-all">
+                    Available
+                </button>
+                <button onclick="filterRooms('other')" id="btn-other" class="filter-btn px-6 py-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-all">
+                    Other Status
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="roomGrid">
+            @foreach (var room in Model)
+            {
+                // Determine Colors based on Status
+                var statusColor = "text-slate-400 border-slate-700/50 bg-slate-800/50"; // Default
+                var badgeColor = "bg-slate-700 text-slate-300";
+                var btnColor = "bg-slate-700 text-slate-300 cursor-not-allowed";
+                var iconColor = "text-slate-500";
+
+                if (room.Status == "Available")
+                {
+                    statusColor = "border-emerald-500/30 bg-emerald-500/5";
+                    badgeColor = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20";
+                    btnColor = "bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20";
+                    iconColor = "text-emerald-500";
+                }
+                else if (room.Status == "Under Maintenance")
+                {
+                    statusColor = "border-orange-500/30 bg-orange-500/5";
+                    badgeColor = "bg-orange-500/20 text-orange-400 border border-orange-500/20";
+                    btnColor = "bg-orange-600 hover:bg-orange-500 text-white"; // Usually disabled, but matching screenshot style
+                    iconColor = "text-orange-500";
+                }
+                else if (room.Status == "Unavailable")
+                {
+                    statusColor = "border-red-500/30 bg-red-500/5";
+                    badgeColor = "bg-red-500/20 text-red-400 border border-red-500/20";
+                    btnColor = "bg-red-900/50 text-red-400 cursor-not-allowed border border-red-500/20";
+                    iconColor = "text-red-500";
+                }
+
+                <div class="room-card group relative overflow-hidden rounded-xl border @statusColor p-6 transition-all hover:border-opacity-100"
+                     data-room-code="@room.Code"
+                     data-status="@room.Status">
+
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-1">@room.Code</h3>
+                            <p class="text-slate-400 text-sm">Laboratory Room</p>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-bold @badgeColor">
+                            @room.Status
+                        </span>
+                    </div>
+
+                    <div class="space-y-3 mb-8">
+                        <div class="flex items-center text-slate-300 text-sm">
+                            <i data-lucide="users" class="w-4 h-4 mr-3 @iconColor"></i>
+                            <span>Capacity: <span class="font-bold text-white">@room.Capacity people</span></span>
+                        </div>
+                        <div class="flex items-center text-slate-300 text-sm">
+                            <i data-lucide="clock" class="w-4 h-4 mr-3 text-slate-500"></i>
+                            <span>7:00 AM - 9:00 PM</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(room.Notes))
+                        {
+                            <div class="flex items-center text-slate-400 text-sm">
+                                <i data-lucide="info" class="w-4 h-4 mr-3 text-red-400"></i>
+                                <span>@room.Notes</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 mt-auto">
+                        @if (room.Status == "Available")
+                        {
+                            <a href="/Booking/Create?roomId=@room.Id" class="flex items-center justify-center py-2.5 rounded-lg font-bold text-sm transition-all @btnColor">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Book Now
+                            </a>
+                        }
+                        else
+                        {
+                            /* Disabled button for non-available rooms */
+                            <button disabled class="flex items-center justify-center py-2.5 rounded-lg font-bold text-sm transition-all opacity-50 cursor-not-allowed bg-slate-800 text-slate-400 border border-slate-700">
+                                Unavailable
+                            </button>
+                        }
+
+                        <a href="/Booking/Schedule/@room.Id" class="flex items-center justify-center py-2.5 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-medium text-sm hover:bg-slate-700 hover:text-white transition-all">
+                            View Schedule
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div id="noResults" class="hidden text-center py-20">
+            <div class="bg-slate-900/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-800">
+                <i data-lucide="search-x" class="w-10 h-10 text-slate-600"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">No rooms found</h3>
+            <p class="text-slate-500">Try adjusting your search or filters</p>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // JavaScript for Client-Side Filtering
+        const searchInput = document.getElementById('searchInput');
+        const cards = document.querySelectorAll('.room-card');
+        const noResults = document.getElementById('noResults');
+        let currentFilter = 'all';
+
+        // 1. Filter Button Logic
+        function filterRooms(filterType) {
+            currentFilter = filterType;
+
+            // Update Button Styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-yellow-500', 'text-black', 'font-bold');
+                btn.classList.add('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            });
+
+            const activeBtn = document.getElementById('btn-' + (filterType === 'Available' ? 'available' : filterType === 'other' ? 'other' : 'all'));
+            activeBtn.classList.remove('bg-slate-800', 'text-slate-300', 'border-slate-700');
+            activeBtn.classList.add('bg-yellow-500', 'text-black', 'font-bold');
+
+            applyFilters();
+        }
+
+        // 2. Search Input Logic
+        searchInput.addEventListener('input', applyFilters);
+
+        // 3. Main Filter Function
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const code = card.getAttribute('data-room-code').toLowerCase();
+                const status = card.getAttribute('data-status');
+
+                let matchesSearch = code.includes(searchTerm);
+                let matchesFilter = true;
+
+                if (currentFilter === 'Available') {
+                    matchesFilter = (status === 'Available');
+                } else if (currentFilter === 'other') {
+                    matchesFilter = (status !== 'Available');
+                }
+
+                if (matchesSearch && matchesFilter) {
+                    card.classList.remove('hidden-card');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden-card');
+                }
+            });
+
+            // Show "No Results" if empty
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

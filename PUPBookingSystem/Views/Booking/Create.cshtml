@@ -1,0 +1,230 @@
+﻿@model PUPBookingSystem.Models.BookingRequest
+@{
+    Layout = null;
+    // Now that Room is in the namespace, this line will work!
+    var room = ViewBag.Room as PUPBookingSystem.Models.Room;
+
+    var today = DateTime.Now;
+    var dates = Enumerable.Range(0, 5).Select(i => today.AddDays(i)).ToList();
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book @(room?.Code ?? "Room") - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+
+        .date-btn.active, .time-btn.active {
+            background-color: #EAB308;
+            color: black;
+            border-color: #EAB308;
+        }
+
+        .date-btn:hover:not(.active), .time-btn:hover:not(.active) {
+            border-color: #EAB308;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-[#0B0F19]">
+
+    <nav class="sticky top-0 z-40 border-b border-slate-800/60 backdrop-blur-xl bg-[#0B0F19]/80 h-16 flex items-center">
+        <div class="max-w-4xl mx-auto px-4 w-full flex items-center justify-between">
+            <a href="/Booking" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-medium">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+            </a>
+            <div class="font-bold text-white">@(room?.Code ?? "Loading...")</div>
+            <div class="w-16"></div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-12">
+
+        <div class="mb-12">
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2 text-white">Lab Room @(room?.Code)</h1>
+                    <p class="text-slate-400 text-lg">Fifth Floor, South Wing</p>
+                </div>
+                <span class="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-semibold text-sm">
+                    @(room?.Status ?? "Unknown")
+                </span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-8 mt-8">
+
+                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <i data-lucide="users" class="w-5 h-5 text-yellow-500 mt-1"></i>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Capacity</p>
+                        <p class="font-bold text-xl text-white">@(room?.Capacity) People</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <i data-lucide="clock" class="w-5 h-5 text-yellow-500 mt-1"></i>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Operating Hours</p>
+                        <p class="font-bold text-xl text-white">7:00 AM - 9:00 PM</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
+                    <i data-lucide="map-pin" class="w-5 h-5 text-yellow-500 mt-1"></i>
+                    <div>
+                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Location</p>
+                        <p class="font-bold text-xl text-white">Room @(room?.Code)</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-12 shadow-xl">
+            <h3 class="font-bold text-xl text-white mb-6">Check Availability</h3>
+
+            <div class="mb-8">
+                <p class="text-sm font-medium text-slate-400 mb-3">Select Date</p>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    @foreach (var date in dates)
+                    {
+                        var isSelected = date.Date == DateTime.Today;
+                        <button type="button"
+                                onclick="selectDate(this, '@date.ToString("yyyy-MM-dd")')"
+                                class="date-btn p-4 rounded-xl border-2 transition-all text-center cursor-pointer @(isSelected ? "active border-yellow-500 bg-yellow-500 text-black" : "bg-slate-950 border-slate-800 text-slate-400")">
+                            <div class="text-xs font-bold uppercase mb-1 opacity-80">@date.ToString("ddd")</div>
+                            <div class="text-2xl font-bold">@date.Day</div>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <p class="text-sm font-medium text-slate-400 mb-3">Available Time Slots</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    @{
+                        var slots = new[] { "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM" };
+                    }
+                    @foreach (var slot in slots)
+                    {
+                        <button type="button" onclick="selectTime(this, '@slot')"
+                                class="time-btn p-3 rounded-lg border-2 bg-slate-950 border-slate-800 text-slate-300 font-medium transition-all hover:bg-slate-800">
+                            @slot
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <button id="btnProceed" onclick="showForm()" disabled
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold text-lg shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed transition-all">
+                Proceed to Booking
+            </button>
+        </div>
+
+        <div id="bookingFormSection" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+            <h3 class="font-bold text-xl text-white mb-6">Complete Your Booking</h3>
+
+            <form asp-action="Create" method="post" class="space-y-6">
+                <input type="hidden" asp-for="RoomId" value="@(room?.Id)" />
+                <input type="hidden" asp-for="Date" id="inputDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                <input type="hidden" asp-for="StartTime" id="inputTime" />
+                <input type="hidden" asp-for="EndTime" id="inputEndTime" />
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Description</label>
+                    <input asp-for="Purpose" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" required />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Organization</label>
+                    <input asp-for="Organization" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Attendees</label>
+                    <input asp-for="Attendees" type="number" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" required />
+                </div>
+
+               
+
+                <div class="flex gap-4 pt-4">
+                    <button type="button" onclick="hideForm()" class="flex-1 py-3.5 rounded-lg bg-slate-800 text-white font-semibold">Cancel</button>
+                    <button type="submit" class="flex-1 py-3.5 rounded-lg bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let selectedDate = "@DateTime.Today.ToString("yyyy-MM-dd")";
+        let selectedTime = null;
+        const dateInput = document.getElementById('inputDate');
+        const timeInput = document.getElementById('inputTime');
+        const endTimeInput = document.getElementById('inputEndTime');
+        const btnProceed = document.getElementById('btnProceed');
+        const formSection = document.getElementById('bookingFormSection');
+
+        function selectDate(btn, val) {
+            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active', 'bg-yellow-500', 'text-black', 'border-yellow-500'));
+            btn.classList.add('active', 'bg-yellow-500', 'text-black', 'border-yellow-500');
+            selectedDate = val;
+            dateInput.value = val;
+            checkReady();
+        }
+
+                function selectTime(btn, displayTime) {
+            // 1. Visual Update
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active', 'bg-yellow-500', 'text-black', 'border-yellow-500'));
+            btn.classList.add('active', 'bg-yellow-500', 'text-black', 'border-yellow-500');
+
+            // 2. Convert "7:00 AM" to "07:00:00" (24-hour format) for the backend
+            let timeParts = displayTime.split(':');
+            let hour = parseInt(timeParts[0]);
+            let minutes = timeParts[1].substring(0, 2);
+            let amp = timeParts[1].substring(3); // AM or PM
+
+            if (amp === "PM" && hour < 12) hour += 12;
+            if (amp === "AM" && hour === 12) hour = 0;
+
+            // Pad with zero (e.g., 7 -> 07)
+            let formattedTime = hour.toString().padStart(2, '0') + ':' + minutes + ':00';
+
+            // 3. Set Input Values
+            selectedTime = displayTime;
+            timeInput.value = formattedTime; // Send "07:00:00"
+
+            // Auto-set End Time (Default +1 hour for now)
+            let endHour = hour + 1;
+            let formattedEndTime = endHour.toString().padStart(2, '0') + ':' + minutes + ':00';
+            endTimeInput.value = formattedEndTime;
+
+            checkReady();
+        }
+
+        function checkReady() {
+            if (selectedDate && selectedTime) {
+                btnProceed.disabled = false;
+                btnProceed.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function showForm() {
+            formSection.classList.remove('hidden');
+            formSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        function hideForm() {
+            formSection.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

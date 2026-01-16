@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Register";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - PUP Labs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E2E8F0;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[#0B0F19] py-12">
+
+    <div class="w-full max-w-md p-6">
+        <a href="/" class="flex items-center gap-2 text-slate-400 hover:text-white mb-8 transition-colors text-sm font-medium">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to home
+        </a>
+
+        <div class="bg-[#131722] border border-slate-800 rounded-2xl p-8 shadow-2xl">
+
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-white mb-2">Create Account</h2>
+                <p class="text-slate-400">Join PUP and start booking lab rooms</p>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="mb-6 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i> @ViewBag.Error
+                </div>
+            }
+
+            <form action="/Account/Register" method="post" class="space-y-4">
+                @Html.AntiForgeryToken()
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Full Name</label>
+                    <input type="text" name="name" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="Juan Dela Cruz" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Email Address</label>
+                    <input type="email" name="email" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="you@pup.edu.ph" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Organization / Department</label>
+                    <input type="text" name="organization"
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="e.g., Computer Science Club" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Password</label>
+                    <input type="password" name="password" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="Create a strong password" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5">Confirm Password</label>
+                    <input type="password" name="confirmPassword" required
+                           class="w-full bg-[#1E2330] border border-slate-700/50 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all placeholder:text-slate-600"
+                           placeholder="Confirm your password" />
+                </div>
+
+                <div class="flex items-center gap-2 pt-2 pb-2">
+                    <input type="checkbox" required class="rounded bg-slate-800 border-slate-700 text-yellow-500 focus:ring-0 cursor-pointer" />
+                    <span class="text-xs text-slate-400">I agree to the Terms of Service and Privacy Policy</span>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 rounded-lg bg-gradient-to-r from-yellow-600 to-red-600 hover:from-yellow-500 hover:to-red-500 text-white font-bold text-sm transition-all shadow-lg shadow-orange-900/20">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="mt-8 text-center text-slate-500 text-sm">
+                Already have an account? <a href="/Account/Login" class="text-yellow-500 hover:text-yellow-400 font-bold transition-colors">Sign in</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
