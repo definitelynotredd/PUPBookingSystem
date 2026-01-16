@@ -95,6 +95,10 @@ namespace PUPBookingSystem.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Hours")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
@@ -112,6 +116,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 1,
                             Capacity = 50,
                             Code = "S501",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -120,6 +125,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 2,
                             Capacity = 50,
                             Code = "S502",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -128,6 +134,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 3,
                             Capacity = 50,
                             Code = "S503",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -136,6 +143,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 4,
                             Capacity = 50,
                             Code = "S504",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -144,6 +152,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 5,
                             Capacity = 50,
                             Code = "S505",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -152,6 +161,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 6,
                             Capacity = 50,
                             Code = "S506",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -160,6 +170,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 7,
                             Capacity = 50,
                             Code = "S507",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -168,6 +179,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 8,
                             Capacity = 50,
                             Code = "S508",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -176,6 +188,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 9,
                             Capacity = 50,
                             Code = "S509",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -184,6 +197,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 10,
                             Capacity = 50,
                             Code = "S510",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -192,6 +206,7 @@ namespace PUPBookingSystem.Migrations
                             Id = 11,
                             Capacity = 50,
                             Code = "S511",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         },
@@ -200,40 +215,10 @@ namespace PUPBookingSystem.Migrations
                             Id = 12,
                             Capacity = 50,
                             Code = "S512",
+                            Hours = "7:00 AM - 9:00 PM",
                             Notes = "Standard Lab Room",
                             Status = "Available"
                         });
-                });
-
-            modelBuilder.Entity("PUPBookingSystem.Models.RoomBlock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoomId")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("RoomBlocks");
                 });
 
             modelBuilder.Entity("PUPBookingSystem.Models.User", b =>
@@ -285,17 +270,6 @@ namespace PUPBookingSystem.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("PUPBookingSystem.Models.RoomBlock", b =>
-                {
-                    b.HasOne("PUPBookingSystem.Models.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
                 });
 #pragma warning restore 612, 618
         }

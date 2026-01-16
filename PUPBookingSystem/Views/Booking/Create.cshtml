@@ -1,11 +1,24 @@
 ﻿@model PUPBookingSystem.Models.BookingRequest
+
 @{
+    ViewData["Title"] = "Book Room";
     Layout = null;
-    // Now that Room is in the namespace, this line will work!
     var room = ViewBag.Room as PUPBookingSystem.Models.Room;
 
-    var today = DateTime.Now;
-    var dates = Enumerable.Range(0, 5).Select(i => today.AddDays(i)).ToList();
+    // Quick slots for convenience
+    var timeSlots = new List<string> { "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM" };
+
+    // Logic: Get next 6 days excluding Sundays
+    var validDates = new List<DateTime>();
+    var dateIterator = DateTime.Today;
+    while (validDates.Count < 6)
+    {
+        if (dateIterator.DayOfWeek != DayOfWeek.Sunday)
+        {
+            validDates.Add(dateIterator);
+        }
+        dateIterator = dateIterator.AddDays(1);
+    }
 }
 
 <!DOCTYPE html>
@@ -13,7 +26,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book @(room?.Code ?? "Room") - PUP Labs</title>
+    <title>Book @room?.Code - PUP Labs</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -23,141 +36,184 @@
             font-family: sans-serif;
         }
 
-        .date-btn.active, .time-btn.active {
-            background-color: #EAB308;
-            color: black;
-            border-color: #EAB308;
+        .selected-date {
+            background-color: #eab308 !important;
+            color: black !important;
+            border-color: #eab308 !important;
         }
 
-        .date-btn:hover:not(.active), .time-btn:hover:not(.active) {
-            border-color: #EAB308;
+        .selected-slot {
+            background-color: #eab308 !important;
+            color: black !important;
+            border-color: #eab308 !important;
+        }
+
+        .slot-disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #1e293b;
+            color: #64748b;
+        }
+
+        /* Time Input Styling */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
         }
     </style>
 </head>
-<body class="min-h-screen bg-[#0B0F19]">
+<body class="min-h-screen bg-[#0B0F19] text-slate-200">
 
-    <nav class="sticky top-0 z-40 border-b border-slate-800/60 backdrop-blur-xl bg-[#0B0F19]/80 h-16 flex items-center">
-        <div class="max-w-4xl mx-auto px-4 w-full flex items-center justify-between">
+    <nav class="sticky top-0 z-40 border-b border-slate-800 bg-[#0B0F19]/80 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
             <a href="/Booking" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-medium">
                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
             </a>
-            <div class="font-bold text-white">@(room?.Code ?? "Loading...")</div>
+            <div class="text-lg font-bold text-white">@room?.Code</div>
             <div class="w-16"></div>
         </div>
     </nav>
 
-    <div class="max-w-4xl mx-auto px-4 py-12">
+    <div class="max-w-4xl mx-auto px-6 py-12">
 
         <div class="mb-12">
             <div class="flex items-start justify-between mb-4">
                 <div>
-                    <h1 class="text-4xl font-bold mb-2 text-white">Lab Room @(room?.Code)</h1>
+                    <h1 class="text-4xl font-bold text-white mb-2">@room?.Code</h1>
                     <p class="text-slate-400 text-lg">Fifth Floor, South Wing</p>
                 </div>
-                <span class="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-semibold text-sm">
-                    @(room?.Status ?? "Unknown")
+                <span class="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-semibold text-sm uppercase tracking-wider">
+                    @room?.Status
                 </span>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-6 mb-8 mt-8">
+            <p class="text-slate-400 text-lg mb-6">@room?.Notes</p>
 
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="flex items-start gap-3 bg-[#131722] border border-slate-800 rounded-lg p-4">
                     <i data-lucide="users" class="w-5 h-5 text-yellow-500 mt-1"></i>
                     <div>
-                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Capacity</p>
-                        <p class="font-bold text-xl text-white">@(room?.Capacity) People</p>
+                        <p class="text-sm text-slate-500 mb-1">Capacity</p>
+                        <p class="font-semibold text-white text-lg">@room?.Capacity People</p>
                     </div>
                 </div>
-
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <div class="flex items-start gap-3 bg-[#131722] border border-slate-800 rounded-lg p-4">
                     <i data-lucide="clock" class="w-5 h-5 text-yellow-500 mt-1"></i>
                     <div>
-                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Operating Hours</p>
-                        <p class="font-bold text-xl text-white">7:00 AM - 9:00 PM</p>
+                        <p class="text-sm text-slate-500 mb-1">Operating Hours</p>
+                        <p class="font-semibold text-white text-lg">@room?.Hours</p>
                     </div>
                 </div>
-
-                <div class="flex items-start gap-3 bg-slate-900 border border-slate-800 rounded-xl p-5">
-                    <i data-lucide="map-pin" class="w-5 h-5 text-yellow-500 mt-1"></i>
-                    <div>
-                        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Location</p>
-                        <p class="font-bold text-xl text-white">Room @(room?.Code)</p>
-                    </div>
-                </div>
-
             </div>
         </div>
 
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-12 shadow-xl">
-            <h3 class="font-bold text-xl text-white mb-6">Check Availability</h3>
+        <div class="bg-[#131722] border border-slate-800 rounded-xl p-6 mb-12 shadow-xl">
+            <h3 class="font-bold text-white text-xl mb-6">Check Availability</h3>
 
             <div class="mb-8">
-                <p class="text-sm font-medium text-slate-400 mb-3">Select Date</p>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                    @foreach (var date in dates)
+                <p class="text-sm font-medium text-slate-400 mb-3">Select Date (Sundays Closed)</p>
+                <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    @for (int i = 0; i < validDates.Count; i++)
                     {
-                        var isSelected = date.Date == DateTime.Today;
+                        var date = validDates[i];
+                        var isSelected = i == 0 ? "selected-date" : "";
+
                         <button type="button"
                                 onclick="selectDate(this, '@date.ToString("yyyy-MM-dd")')"
-                                class="date-btn p-4 rounded-xl border-2 transition-all text-center cursor-pointer @(isSelected ? "active border-yellow-500 bg-yellow-500 text-black" : "bg-slate-950 border-slate-800 text-slate-400")">
-                            <div class="text-xs font-bold uppercase mb-1 opacity-80">@date.ToString("ddd")</div>
-                            <div class="text-2xl font-bold">@date.Day</div>
+                                class="date-btn @isSelected p-4 rounded-lg border border-slate-700 bg-[#1E2330] hover:border-yellow-500/50 transition-all text-center group">
+                            <div class="text-sm font-semibold text-slate-400 group-[.selected-date]:text-black/70">
+                                @date.ToString("ddd")
+                            </div>
+                            <div class="text-lg font-bold text-white group-[.selected-date]:text-black">
+                                @date.ToString("dd")
+                            </div>
                         </button>
                     }
                 </div>
             </div>
 
-            <div class="mb-8">
-                <p class="text-sm font-medium text-slate-400 mb-3">Available Time Slots</p>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    @{
-                        var slots = new[] { "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM" };
-                    }
-                    @foreach (var slot in slots)
+            <div class="mb-6">
+                <p class="text-sm font-medium text-slate-400 mb-3">Available Time Slots (2-Hour Blocks)</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="slotsContainer">
+                    @foreach (var slot in timeSlots)
                     {
-                        <button type="button" onclick="selectTime(this, '@slot')"
-                                class="time-btn p-3 rounded-lg border-2 bg-slate-950 border-slate-800 text-slate-300 font-medium transition-all hover:bg-slate-800">
+                        <button type="button"
+                                onclick="selectSlot(this, '@slot')"
+                                class="slot-btn p-3 rounded-lg border border-slate-700 bg-[#1E2330] hover:border-yellow-500/50 font-medium text-slate-300 transition-all">
                             @slot
                         </button>
                     }
                 </div>
             </div>
 
-            <button id="btnProceed" onclick="showForm()" disabled
-                    class="w-full py-4 rounded-xl bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold text-lg shadow-lg shadow-yellow-500/20 opacity-50 cursor-not-allowed transition-all">
+            <div class="relative py-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-800"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-[#131722] text-slate-500">(Optional) Select Custom Time</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">Start Time</label>
+                    <input type="time" id="customStart" onchange="handleCustomTimeChange()"
+                           class="w-full bg-[#1E2330] border border-slate-700 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all" />
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-2 uppercase">End Time</label>
+                    <input type="time" id="customEnd" onchange="handleCustomTimeChange()"
+                           class="w-full bg-[#1E2330] border border-slate-700 text-white rounded-lg py-3 px-4 focus:ring-1 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all" />
+                </div>
+            </div>
+
+            <div id="customErrorMsg" class="hidden mb-4 text-center text-red-400 text-sm font-bold bg-red-500/10 py-2 rounded-lg border border-red-500/20">
+                Invalid time selection
+            </div>
+
+            <button id="proceedBtn" onclick="showForm()" disabled
+                    class="w-full py-3 rounded-lg bg-gradient-to-r from-yellow-500 to-yellow-600 hover:shadow-lg hover:shadow-yellow-500/20 text-black font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                 Proceed to Booking
             </button>
         </div>
 
-        <div id="bookingFormSection" class="hidden bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
-            <h3 class="font-bold text-xl text-white mb-6">Complete Your Booking</h3>
+        <div id="bookingFormSection" class="hidden bg-[#131722] border border-slate-800 rounded-xl p-6 animate-fade-in-up">
+            <h3 class="font-bold text-white text-xl mb-6">Complete Your Booking</h3>
 
-            <form asp-action="Create" method="post" class="space-y-6">
-                <input type="hidden" asp-for="RoomId" value="@(room?.Id)" />
-                <input type="hidden" asp-for="Date" id="inputDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                <input type="hidden" asp-for="StartTime" id="inputTime" />
-                <input type="hidden" asp-for="EndTime" id="inputEndTime" />
+            <form action="/Booking/Create" method="post" class="space-y-4">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="RoomId" value="@Model.RoomId" />
+                <input type="hidden" name="Date" id="finalDate" value="@validDates[0].ToString("yyyy-MM-dd")" />
+                <input type="hidden" name="StartTime" id="finalStartTime" />
+                <input type="hidden" name="EndTime" id="finalEndTime" />
 
-                <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">Description</label>
-                    <input asp-for="Purpose" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" required />
+                <div class="p-4 bg-[#1E2330] rounded-lg mb-4 border border-slate-700">
+                    <p class="text-sm text-slate-400">Selected Slot:</p>
+                    <p class="text-white font-bold" id="summaryText">Please select a time above.</p>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">Organization</label>
-                    <input asp-for="Organization" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" />
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Purpose / Activity</label>
+                    <textarea name="Purpose" required placeholder="e.g., CS Club General Assembly" rows="3"
+                              class="w-full px-4 py-3 rounded-lg bg-[#0B0F19] border border-slate-700 text-white placeholder:text-slate-600 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all resize-none"></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">Attendees</label>
-                    <input asp-for="Attendees" type="number" class="w-full px-4 py-3.5 rounded-lg bg-slate-950 border border-slate-800 text-white" required />
+                    <label class="block text-sm font-medium text-slate-300 mb-2">Expected Attendees</label>
+                    <input type="number" name="Attendees" required min="1" max="@room?.Capacity" placeholder="Max @room?.Capacity"
+                           class="w-full px-4 py-3 rounded-lg bg-[#0B0F19] border border-slate-700 text-white placeholder:text-slate-600 focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all" />
                 </div>
 
-               
-
-                <div class="flex gap-4 pt-4">
-                    <button type="button" onclick="hideForm()" class="flex-1 py-3.5 rounded-lg bg-slate-800 text-white font-semibold">Cancel</button>
-                    <button type="submit" class="flex-1 py-3.5 rounded-lg bg-gradient-to-r from-yellow-600 to-yellow-500 text-black font-bold">Submit</button>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="hideForm()"
+                            class="flex-1 py-3 rounded-lg bg-[#1E2330] hover:bg-slate-700 text-slate-300 font-semibold transition-all border border-slate-700">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="flex-1 py-3 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-bold shadow-lg shadow-yellow-500/20 transition-all">
+                        Submit Request
+                    </button>
                 </div>
             </form>
         </div>
@@ -165,65 +221,190 @@
 
     <script>
         lucide.createIcons();
-        let selectedDate = "@DateTime.Today.ToString("yyyy-MM-dd")";
-        let selectedTime = null;
-        const dateInput = document.getElementById('inputDate');
-        const timeInput = document.getElementById('inputTime');
-        const endTimeInput = document.getElementById('inputEndTime');
-        const btnProceed = document.getElementById('btnProceed');
-        const formSection = document.getElementById('bookingFormSection');
+        const roomId = "@room?.Id";
+        let currentDate = "@validDates[0].ToString("yyyy-MM-dd")";
+        let bookedSlots = [];
 
-        function selectDate(btn, val) {
-            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active', 'bg-yellow-500', 'text-black', 'border-yellow-500'));
-            btn.classList.add('active', 'bg-yellow-500', 'text-black', 'border-yellow-500');
-            selectedDate = val;
-            dateInput.value = val;
-            checkReady();
+        // Lab Operating Hours (24h format)
+        const OPEN_HOUR = 7;
+        const CLOSE_HOUR = 21; // 9 PM
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAvailability(currentDate);
+        });
+
+        // --- DATE LOGIC ---
+        function selectDate(btn, dateStr) {
+            document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected-date'));
+            btn.classList.add('selected-date');
+
+            currentDate = dateStr;
+            document.getElementById('finalDate').value = dateStr;
+
+            // Reset everything
+            resetSlotSelection();
+            clearCustomInputs();
+            fetchAvailability(dateStr);
         }
 
-                function selectTime(btn, displayTime) {
-            // 1. Visual Update
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active', 'bg-yellow-500', 'text-black', 'border-yellow-500'));
-            btn.classList.add('active', 'bg-yellow-500', 'text-black', 'border-yellow-500');
-
-            // 2. Convert "7:00 AM" to "07:00:00" (24-hour format) for the backend
-            let timeParts = displayTime.split(':');
-            let hour = parseInt(timeParts[0]);
-            let minutes = timeParts[1].substring(0, 2);
-            let amp = timeParts[1].substring(3); // AM or PM
-
-            if (amp === "PM" && hour < 12) hour += 12;
-            if (amp === "AM" && hour === 12) hour = 0;
-
-            // Pad with zero (e.g., 7 -> 07)
-            let formattedTime = hour.toString().padStart(2, '0') + ':' + minutes + ':00';
-
-            // 3. Set Input Values
-            selectedTime = displayTime;
-            timeInput.value = formattedTime; // Send "07:00:00"
-
-            // Auto-set End Time (Default +1 hour for now)
-            let endHour = hour + 1;
-            let formattedEndTime = endHour.toString().padStart(2, '0') + ':' + minutes + ':00';
-            endTimeInput.value = formattedEndTime;
-
-            checkReady();
-        }
-
-        function checkReady() {
-            if (selectedDate && selectedTime) {
-                btnProceed.disabled = false;
-                btnProceed.classList.remove('opacity-50', 'cursor-not-allowed');
+        async function fetchAvailability(date) {
+            try {
+                const response = await fetch(`/Booking/GetBookedSlots?roomId=${roomId}&date=${date}`);
+                bookedSlots = await response.json();
+                refreshSlotsUI();
+                if(document.getElementById('customStart').value) handleCustomTimeChange();
+            } catch (err) {
+                console.error("Error fetching slots", err);
             }
         }
 
-        function showForm() {
-            formSection.classList.remove('hidden');
-            formSection.scrollIntoView({ behavior: 'smooth' });
+        // --- PRE-SET SLOTS LOGIC ---
+        function refreshSlotsUI() {
+            const slotBtns = document.querySelectorAll('.slot-btn');
+
+            slotBtns.forEach(btn => {
+                const slotTime = btn.innerText.trim();
+                if(!btn.getAttribute('data-original-text')) btn.setAttribute('data-original-text', slotTime);
+                const originalText = btn.getAttribute('data-original-text');
+
+                const startMin = parseTimeToMinutes(convertTo24Hour(slotTime));
+                const endMin = startMin + 120; // +2 hours
+
+                const isConflict = checkRangeConflict(startMin, endMin);
+
+                if (isConflict) {
+                    btn.classList.add('slot-disabled');
+                    btn.disabled = true;
+                    btn.innerText = "Booked";
+                } else {
+                    btn.classList.remove('slot-disabled');
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                }
+            });
         }
+
+        function selectSlot(btn, timeStr) {
+            if (btn.disabled) return;
+
+            clearCustomInputs();
+
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected-slot'));
+            btn.classList.add('selected-slot');
+
+            const start24 = convertTo24Hour(timeStr);
+            const d = new Date(`2000-01-01T${start24}:00`);
+            d.setHours(d.getHours() + 2);
+            const end24 = d.toTimeString().substring(0, 5);
+
+            setFinalValues(start24, end24);
+        }
+
+        // --- CUSTOM TIME LOGIC ---
+        function handleCustomTimeChange() {
+            const startInput = document.getElementById('customStart');
+            const endInput = document.getElementById('customEnd');
+            const errorDiv = document.getElementById('customErrorMsg');
+            const proceedBtn = document.getElementById('proceedBtn');
+
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected-slot'));
+
+            if (!startInput.value || !endInput.value) {
+                proceedBtn.disabled = true;
+                return;
+            }
+
+            const startMin = parseTimeToMinutes(startInput.value);
+            const endMin = parseTimeToMinutes(endInput.value);
+
+            if (startMin >= endMin) {
+                showError("End time must be after start time.");
+                return;
+            }
+
+            if (startMin < (OPEN_HOUR * 60) || endMin > (CLOSE_HOUR * 60)) {
+                showError("Booking must be between 7:00 AM and 9:00 PM.");
+                return;
+            }
+
+            if (checkRangeConflict(startMin, endMin)) {
+                showError("Selected time overlaps with an existing booking.");
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            setFinalValues(startInput.value, endInput.value);
+        }
+
+        function clearCustomInputs() {
+            document.getElementById('customStart').value = '';
+            document.getElementById('customEnd').value = '';
+            document.getElementById('customErrorMsg').classList.add('hidden');
+        }
+
+        function showError(msg) {
+            const errorDiv = document.getElementById('customErrorMsg');
+            errorDiv.innerText = msg;
+            errorDiv.classList.remove('hidden');
+            document.getElementById('proceedBtn').disabled = true;
+        }
+
+        // --- SHARED HELPERS ---
+
+        function setFinalValues(start, end) {
+            document.getElementById('finalStartTime').value = start;
+            document.getElementById('finalEndTime').value = end;
+
+            const startDisplay = formatTimeDisplay(start);
+            const endDisplay = formatTimeDisplay(end);
+
+            document.getElementById('summaryText').innerText = `${currentDate} • ${startDisplay} - ${endDisplay}`;
+            document.getElementById('proceedBtn').disabled = false;
+        }
+
+        function checkRangeConflict(newStartMin, newEndMin) {
+            return bookedSlots.some(booking => {
+                const bStart = parseTimeToMinutes(booking.start);
+                const bEnd = parseTimeToMinutes(booking.end);
+                return (newStartMin < bEnd) && (newEndMin > bStart);
+            });
+        }
+
+        function parseTimeToMinutes(timeStr) {
+            const [h, m] = timeStr.split(':').map(Number);
+            return (h * 60) + m;
+        }
+
+        function convertTo24Hour(timeStr) {
+            const [time, modifier] = timeStr.split(' ');
+            let [hours, minutes] = time.split(':');
+            if (hours === '12') hours = '00';
+            if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+            return `${hours.toString().padStart(2, '0')}:${minutes}`;
+        }
+
+        function formatTimeDisplay(time24) {
+            const [h, m] = time24.split(':');
+            const hour = parseInt(h);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const h12 = hour % 12 || 12;
+            return `${h12}:${m} ${ampm}`;
+        }
+
+        function showForm() {
+            document.getElementById('bookingFormSection').classList.remove('hidden');
+            document.getElementById('bookingFormSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
         function hideForm() {
-            formSection.classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('bookingFormSection').classList.add('hidden');
+            document.body.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetSlotSelection() {
+            document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected-slot'));
+            document.getElementById('proceedBtn').disabled = true;
+            document.getElementById('bookingFormSection').classList.add('hidden');
         }
     </script>
 </body>

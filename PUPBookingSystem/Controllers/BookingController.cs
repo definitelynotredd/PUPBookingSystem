@@ -100,6 +100,48 @@ namespace PUPBookingSystem.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("MyRequests");
+
+        }
+
+        // ... inside BookingController class ...
+
+        // GET: View Schedule for a specific room
+        [HttpGet]
+        public async Task<IActionResult> Schedule(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var room = await _context.Rooms.FindAsync(id);
+            if (room == null) return NotFound();
+
+            // Fetch upcoming APPROVED bookings only
+            var approvedBookings = await _context.BookingRequests
+                .Where(b => b.RoomId == id && b.Status == "Approved" && b.Date >= DateTime.Today)
+                .OrderBy(b => b.Date)
+                .ThenBy(b => b.StartTime)
+                .ToListAsync();
+
+            ViewBag.Room = room;
+            return View(approvedBookings);
+        }
+
+        // ... inside BookingController ...
+
+        // GET: Check availability via AJAX
+        [HttpGet]
+        public async Task<IActionResult> GetBookedSlots(int roomId, DateTime date)
+        {
+            var bookedSlots = await _context.BookingRequests
+                .Where(b => b.RoomId == roomId &&
+                            b.Status == "Approved" &&
+                            b.Date.Date == date.Date)
+                .Select(b => new {
+                    start = b.StartTime.ToString(@"hh\:mm"),
+                    end = b.EndTime.ToString(@"hh\:mm")
+                })
+                .ToListAsync();
+
+            return Json(bookedSlots);
         }
     }
 }

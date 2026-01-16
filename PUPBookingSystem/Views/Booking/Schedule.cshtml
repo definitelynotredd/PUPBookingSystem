@@ -1,80 +1,115 @@
-﻿@model IEnumerable<BookingRequest>
+﻿@model IEnumerable<PUPBookingSystem.Models.BookingRequest>
+
 @{
-    var room = ViewBag.Room as Room;
+    ViewData["Title"] = "Room Schedule";
+    Layout = null; // Standalone layout
+    var room = ViewBag.Room as PUPBookingSystem.Models.Room;
 }
 
-<div class="max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h2 class="text-3xl font-bold text-white flex items-center">
-                <span class="text-purple-500 mr-2">@room.Code</span> Schedule
-            </h2>
-            <p class="text-slate-400 mt-1 flex items-center">
-                <i data-lucide="users" class="w-4 h-4 mr-2"></i> Capacity: @room.Capacity
-                <span class="mx-2 text-slate-700">|</span>
-                @room.Notes
-            </p>
-        </div>
-        <a asp-action="Create" asp-route-roomId="@room.Id" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-lg shadow-lg shadow-purple-900/20 transition font-medium flex items-center">
-            <i data-lucide="plus" class="w-4 h-4 mr-2"></i> Book This Room
-        </a>
-    </div>
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schedule - @room?.Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { background-color: #0B0F19; color: #E2E8F0; font-family: sans-serif; }
+    </style>
+</head>
+<body class="bg-[#0B0F19] min-h-screen">
 
-    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-        <div class="px-6 py-4 border-b border-slate-800 bg-slate-950/50">
-            <h3 class="font-bold text-slate-300 flex items-center">
-                <i data-lucide="calendar-check" class="w-4 h-4 mr-2 text-purple-400"></i> Upcoming Approved Bookings
-            </h3>
+    <nav class="sticky top-0 z-40 border-b border-slate-800 bg-[#131722]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <a href="/Booking" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+            </a>
+            <span class="text-slate-700">|</span>
+            <span class="font-bold text-white text-lg">Room @room?.Code Schedule</span>
         </div>
+    </nav>
 
-        @if (!Model.Any())
-        {
-            <div class="p-12 text-center text-slate-500">
-                <div class="bg-slate-800/50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="calendar-off" class="w-8 h-8 text-slate-600"></i>
-                </div>
-                <p>No upcoming bookings. This room is free!</p>
+    <div class="max-w-5xl mx-auto px-6 py-10">
+
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div>
+                <h2 class="text-3xl font-bold text-white flex items-center">
+                    <span class="text-yellow-500 mr-2">@room?.Code</span> Schedule
+                </h2>
+                <p class="text-slate-400 mt-1 flex items-center text-sm">
+                    <i data-lucide="users" class="w-4 h-4 mr-2"></i> Capacity: @room?.Capacity
+                    <span class="mx-2 text-slate-700">|</span>
+                    @room?.Notes
+                </p>
             </div>
-        }
-        else
-        {
-            <table class="w-full text-left">
-                <thead class="bg-slate-950 text-xs uppercase text-slate-500 font-semibold border-b border-slate-800">
-                    <tr>
-                        <th class="px-6 py-4">Date</th>
-                        <th class="px-6 py-4">Time</th>
-                        <th class="px-6 py-4">Activity</th>
-                        <th class="px-6 py-4">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-800">
-                    @foreach (var item in Model)
-                    {
-                        <tr class="hover:bg-slate-800/50 transition">
-                            <td class="px-6 py-4 font-medium text-slate-200">
-                                @item.Date.ToString("MMM dd, yyyy")
-                            </td>
-                            <td class="px-6 py-4 text-purple-400 font-medium font-mono text-sm">
-                                @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
-                            </td>
-                            <td class="px-6 py-4 text-slate-400">
-                                @item.Purpose
-                            </td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
-                                    Booked (@item.Attendees)
-                                </span>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
+            <a href="/Booking/Create?roomId=@room?.Id" class="bg-yellow-500 hover:bg-yellow-400 text-black px-6 py-3 rounded-xl shadow-lg shadow-yellow-500/20 transition font-bold flex items-center gap-2">
+                <i data-lucide="plus" class="w-4 h-4"></i> Book This Room
+            </a>
+        </div>
+
+        <div class="bg-[#131722] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+            <div class="px-6 py-4 border-b border-slate-800 bg-slate-800/30">
+                <h3 class="font-bold text-slate-300 flex items-center gap-2">
+                    <i data-lucide="calendar-check" class="w-4 h-4 text-yellow-500"></i> Upcoming Approved Bookings
+                </h3>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="p-16 text-center text-slate-500">
+                    <div class="bg-slate-800/50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-700">
+                        <i data-lucide="calendar-off" class="w-8 h-8 text-slate-600"></i>
+                    </div>
+                    <h3 class="text-white font-bold mb-1">No Bookings Found</h3>
+                    <p class="text-sm">This room is completely free for upcoming dates!</p>
+                </div>
+            }
+            else
+            {
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-[#0B0F19] text-xs uppercase text-slate-500 font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="px-6 py-4">Date</th>
+                                <th class="px-6 py-4">Time</th>
+                                <th class="px-6 py-4">Activity</th>
+                                <th class="px-6 py-4 text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            @foreach (var item in Model)
+                            {
+                                <tr class="hover:bg-slate-800/30 transition-colors">
+                                    <td class="px-6 py-4 font-medium text-slate-200">
+                                        <div class="flex items-center gap-2">
+                                            <i data-lucide="calendar" class="w-4 h-4 text-slate-600"></i>
+                                            @item.Date.ToString("MMM dd, yyyy")
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-yellow-500 font-bold font-mono text-sm">
+                                        @DateTime.Today.Add(item.StartTime).ToString("hh:mm tt") -
+                                        @DateTime.Today.Add(item.EndTime).ToString("hh:mm tt")
+                                    </td>
+                                    <td class="px-6 py-4 text-slate-400">
+                                        @item.Purpose
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+                                            Booked
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
     </div>
 
-    <div class="mt-8">
-        <a asp-action="Index" class="text-slate-500 hover:text-purple-400 transition flex items-center">
-            <i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i> Back to Room Directory
-        </a>
-    </div>
-</div>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

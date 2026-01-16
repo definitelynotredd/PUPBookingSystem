@@ -78,5 +78,31 @@ namespace PUPBookingSystem.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        // GET: Admin/Calendar
+        public IActionResult Calendar()
+        {
+            // Fetch only APPROVED bookings
+            var bookings = _context.BookingRequests
+                .Include(b => b.Room)
+                .Include(b => b.User)
+                .Where(b => b.Status == "Approved")
+                .Select(b => new
+                {
+                    id = b.Id,
+                    title = b.Purpose,
+                    room = b.Room.Code,
+                    date = b.Date.ToString("yyyy-MM-dd"),
+                    start = DateTime.Today.Add(b.StartTime).ToString("hh:mm tt"),
+                    end = DateTime.Today.Add(b.EndTime).ToString("hh:mm tt"),
+                    userName = b.User.Name
+                })
+                .ToList();
+
+            // Pass data to view using ViewBag to serialize it later
+            ViewBag.Bookings = bookings;
+
+            return View();
+        }
     }
 }

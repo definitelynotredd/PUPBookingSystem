@@ -16,5 +16,7 @@ namespace PUPBookingSystem.Models
         public string? Notes { get; set; } // Fixed Warning: Added '?' to make it optional
 
         public string? Description { get; set; }
+
+        public string Hours { get; set; } = string.Empty;
     }
 }

@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Admin Dashboard";
-    Layout = null;
+    Layout = null; // Standalone layout
 }
 
 <!DOCTYPE html>
@@ -24,16 +24,28 @@
 <body class="bg-[#0B0F19] min-h-screen pb-12">
 
     <nav class="sticky top-0 z-40 border-b border-slate-800 bg-[#131722]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center font-bold text-white shadow-lg shadow-red-900/20">A</div>
-            <span class="font-bold text-white text-lg tracking-tight">Admin Dashboard</span>
+
+        <div class="flex items-center gap-8">
+            <div class="flex items-center gap-3">
+                
+                <span class="font-bold text-white text-lg tracking-tight">Admin Dashboard</span>
+            </div>
+
+            <div class="flex items-center gap-1 bg-[#0B0F19] p-1 rounded-lg border border-slate-800">
+                <a href="/Admin" class="px-4 py-2 rounded-md text-sm font-bold bg-slate-800 text-white shadow-md transition-all flex items-center gap-2">
+                    <i data-lucide="list" class="w-4 h-4 text-yellow-500"></i> List
+                </a>
+                <a href="/Admin/Calendar" class="px-4 py-2 rounded-md text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-all flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-4 h-4"></i> Calendar
+                </a>
+            </div>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-6">
             <a href="/" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium">
                 <i data-lucide="home" class="w-4 h-4"></i> Home
             </a>
-            <div class="h-4 w-px bg-slate-700"></div>
+            <div class="h-4 w-px bg-slate-800"></div>
             <a href="/Account/Logout" class="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-medium">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Logout
             </a>
