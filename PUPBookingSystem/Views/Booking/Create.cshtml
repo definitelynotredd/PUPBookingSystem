@@ -8,16 +8,17 @@
     // Quick slots for convenience
     var timeSlots = new List<string> { "7:00 AM", "9:00 AM", "11:00 AM", "1:00 PM", "3:00 PM", "5:00 PM" };
 
-    // Logic: Get next 6 days excluding Sundays
-    var validDates = new List<DateTime>();
-    var dateIterator = DateTime.Today;
-    while (validDates.Count < 6)
+    // Get current month info
+    var today = DateTime.Today;
+    var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
+    var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
+    var startDayOfWeek = (int)firstDayOfMonth.DayOfWeek; // 0 = Sunday
+
+    // Default selected date: first valid date (not Sunday, not past)
+    DateTime defaultSelectedDate = today;
+    if (today.DayOfWeek == DayOfWeek.Sunday)
     {
-        if (dateIterator.DayOfWeek != DayOfWeek.Sunday)
-        {
-            validDates.Add(dateIterator);
-        }
-        dateIterator = dateIterator.AddDays(1);
+        defaultSelectedDate = today.AddDays(1);
     }
 }
 
@@ -26,7 +27,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Book @room?.Code - PUP Labs</title>
+    <title>Book @room?.Code - PUP L.A.B.S.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -53,6 +54,18 @@
             cursor: not-allowed;
             background-color: #1e293b;
             color: #64748b;
+        }
+
+        .date-disabled {
+            opacity: 0.3;
+            cursor: not-allowed !important;
+            background-color: #1e293b !important;
+            color: #475569 !important;
+            border-color: #334155 !important;
+        }
+
+        .date-disabled:hover {
+            border-color: #334155 !important;
         }
 
         /* Time Input Styling */
@@ -82,7 +95,7 @@
                     <h1 class="text-4xl font-bold text-white mb-2">@room?.Code</h1>
                     <p class="text-slate-400 text-lg">Fifth Floor, South Wing</p>
                 </div>
-                <span class="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-semibold text-sm uppercase tracking-wider">
+                <span class="px-4 py-2 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-semibold text-sm uppercase">
                     @room?.Status
                 </span>
             </div>
@@ -111,24 +124,62 @@
             <h3 class="font-bold text-white text-xl mb-6">Check Availability</h3>
 
             <div class="mb-8">
-                <p class="text-sm font-medium text-slate-400 mb-3">Select Date (Sundays Closed)</p>
-                <div class="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                    @for (int i = 0; i < validDates.Count; i++)
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm font-medium text-slate-400">Select Date (Sundays Closed)</p>
+                    <p class="text-lg font-bold text-yellow-500">@today.ToString("MMMM yyyy")</p>
+                </div>
+                
+                <!-- Calendar Header (Days of Week) -->
+                <div class="grid grid-cols-7 gap-2 mb-2">
+                    <div class="text-center text-xs font-bold text-red-400/50 py-2">Sun</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Mon</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Tue</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Wed</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Thu</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Fri</div>
+                    <div class="text-center text-xs font-bold text-slate-500 py-2">Sat</div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="grid grid-cols-7 gap-2">
+                    @* Empty cells for days before the 1st of the month *@
+                    @for (int i = 0; i < startDayOfWeek; i++)
                     {
-                        var date = validDates[i];
-                        var isSelected = i == 0 ? "selected-date" : "";
+                        <div class="p-3"></div>
+                    }
+
+                    @* Actual days of the month *@
+                    @for (int day = 1; day <= daysInMonth; day++)
+                    {
+                        var currentDate = new DateTime(today.Year, today.Month, day);
+                        var isPast = currentDate < today;
+                        var isSunday = currentDate.DayOfWeek == DayOfWeek.Sunday;
+                        var isDisabled = isPast || isSunday;
+                        var isSelected = currentDate == defaultSelectedDate;
+
+                        var disabledClass = isDisabled ? "date-disabled" : "";
+                        var selectedClass = isSelected && !isDisabled ? "selected-date" : "";
 
                         <button type="button"
-                                onclick="selectDate(this, '@date.ToString("yyyy-MM-dd")')"
-                                class="date-btn @isSelected p-4 rounded-lg border border-slate-700 bg-[#1E2330] hover:border-yellow-500/50 transition-all text-center group">
-                            <div class="text-sm font-semibold text-slate-400 group-[.selected-date]:text-black/70">
-                                @date.ToString("ddd")
-                            </div>
-                            <div class="text-lg font-bold text-white group-[.selected-date]:text-black">
-                                @date.ToString("dd")
+                                onclick="@(isDisabled ? "" : $"selectDate(this, '{currentDate:yyyy-MM-dd}')")"
+                                @(isDisabled ? "disabled" : "")
+                                class="date-btn @disabledClass @selectedClass p-3 rounded-lg border border-slate-700 bg-[#1E2330] hover:border-yellow-500/50 transition-all text-center group">
+                            <div class="text-sm font-bold text-white group-[.selected-date]:text-black @(isSunday && !isPast ? "text-red-400/50" : "")">
+                                @day
                             </div>
                         </button>
                     }
+                </div>
+
+                <div class="flex items-center gap-4 mt-4 text-xs text-slate-500">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded bg-yellow-500"></div>
+                        <span>Selected</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded bg-slate-700 opacity-30"></div>
+                        <span>Unavailable (Past/Sunday)</span>
+                    </div>
                 </div>
             </div>
 
@@ -184,7 +235,7 @@
             <form action="/Booking/Create" method="post" class="space-y-4">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="RoomId" value="@Model.RoomId" />
-                <input type="hidden" name="Date" id="finalDate" value="@validDates[0].ToString("yyyy-MM-dd")" />
+                <input type="hidden" name="Date" id="finalDate" value="@defaultSelectedDate.ToString("yyyy-MM-dd")" />
                 <input type="hidden" name="StartTime" id="finalStartTime" />
                 <input type="hidden" name="EndTime" id="finalEndTime" />
 
@@ -222,7 +273,7 @@
     <script>
         lucide.createIcons();
         const roomId = "@room?.Id";
-        let currentDate = "@validDates[0].ToString("yyyy-MM-dd")";
+        let currentDate = "@defaultSelectedDate.ToString("yyyy-MM-dd")";
         let bookedSlots = [];
 
         // Lab Operating Hours (24h format)
@@ -235,6 +286,8 @@
 
         // --- DATE LOGIC ---
         function selectDate(btn, dateStr) {
+            if (btn.disabled) return;
+
             document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('selected-date'));
             btn.classList.add('selected-date');
 

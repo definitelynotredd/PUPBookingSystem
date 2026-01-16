@@ -104,5 +104,33 @@ namespace PUPBookingSystem.Controllers
 
             return View();
         }
+        // GET: Admin/Rooms
+        public async Task<IActionResult> Rooms()
+        {
+            // Fetch all rooms from the database
+            var rooms = await _context.Rooms.OrderBy(r => r.Id).ToListAsync();
+            return View(rooms);
+        }
+
+        // POST: Admin/UpdateRoom
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRoom(int id, int capacity, string status, string hours, string notes)
+        {
+            var room = await _context.Rooms.FindAsync(id);
+            if (room == null) return NotFound();
+
+            // Update the room details
+            room.Capacity = capacity;
+            room.Status = status;
+            room.Hours = hours;
+            room.Notes = notes;
+
+            _context.Rooms.Update(room);
+            await _context.SaveChangesAsync();
+
+            // Go back to the Rooms list
+            return RedirectToAction("Rooms");
+        }
     }
 }
