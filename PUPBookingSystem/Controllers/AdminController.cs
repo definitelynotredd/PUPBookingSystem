@@ -54,12 +54,16 @@ namespace PUPBookingSystem.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Approve(int id)
+        public async Task<IActionResult> Approve(int id, string? comment)
         {
             var req = await _context.BookingRequests.FindAsync(id);
             if (req != null)
             {
                 req.Status = "Approved";
+                if (!string.IsNullOrWhiteSpace(comment))
+                {
+                    req.AdminNote = comment;
+                }
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");
@@ -68,12 +72,30 @@ namespace PUPBookingSystem.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reject(int id)
+        public async Task<IActionResult> Reject(int id, string? comment)
         {
             var req = await _context.BookingRequests.FindAsync(id);
             if (req != null)
             {
                 req.Status = "Rejected";
+                if (!string.IsNullOrWhiteSpace(comment))
+                {
+                    req.AdminNote = comment;
+                }
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index");
+        }
+
+        // POST: Admin/AddComment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(int id, string comment)
+        {
+            var req = await _context.BookingRequests.FindAsync(id);
+            if (req != null && !string.IsNullOrWhiteSpace(comment))
+            {
+                req.AdminNote = comment;
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index");

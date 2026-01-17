@@ -154,29 +154,37 @@
 
                     <div class="mb-6">
                         <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-2">
-                            <i data-lucide="message-square" class="w-3 h-3"></i> Comments
+                            <i data-lucide="message-square" class="w-3 h-3"></i> Admin Comment
                         </p>
+                        @if (!string.IsNullOrEmpty(item.AdminNote))
+                        {
+                            <div class="mb-3 p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+                                <p class="text-sm text-slate-300">@item.AdminNote</p>
+                            </div>
+                        }
                         <div class="flex gap-2">
-                            <input type="text" placeholder="Add a comment..." disabled
-                                   class="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-400 focus:outline-none cursor-not-allowed opacity-60" />
-                            <button disabled class="px-4 py-2 bg-slate-800 text-slate-500 rounded-lg text-sm font-bold cursor-not-allowed opacity-60">Add</button>
+                            <input type="text" id="comment-@item.Id" placeholder="Add a comment for the student..." 
+                                   value="@item.AdminNote"
+                                   class="w-full bg-[#0B0F19] border border-slate-800 rounded-lg px-4 py-2 text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-yellow-500/50 transition-all" />
                         </div>
                     </div>
 
                     @if (item.Status == "Pending")
                     {
                         <div class="flex items-center gap-3 pt-4 border-t border-slate-800">
-                            <form action="/Admin/Approve" method="post" class="flex-1">
+                            <form action="/Admin/Approve" method="post" class="flex-1" onsubmit="syncComment(this, @item.Id)">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
+                                <input type="hidden" name="comment" id="approve-comment-@item.Id" value="@item.AdminNote" />
                                 <button type="submit" class="w-full py-3 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2">
                                     <i data-lucide="check" class="w-4 h-4"></i> Approve Request
                                 </button>
                             </form>
 
-                            <form action="/Admin/Reject" method="post" class="flex-1">
+                            <form action="/Admin/Reject" method="post" class="flex-1" onsubmit="syncComment(this, @item.Id)">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@item.Id" />
+                                <input type="hidden" name="comment" id="reject-comment-@item.Id" value="@item.AdminNote" />
                                 <button type="submit" class="w-full py-3 rounded-lg bg-slate-800 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 border border-slate-700 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="x" class="w-4 h-4"></i> Reject
                                 </button>
@@ -189,6 +197,7 @@
                             <p class="text-sm text-slate-500 italic">This request has been processed.</p>
                         </div>
                     }
+
 
                 </div>
             }
@@ -208,6 +217,19 @@
 
     <script>
         lucide.createIcons();
+
+        // Sync the comment input with the hidden fields in Approve/Reject forms
+        function syncComment(form, bookingId) {
+            const commentInput = document.getElementById('comment-' + bookingId);
+            const commentValue = commentInput ? commentInput.value : '';
+            
+            // Update the hidden comment field in the submitted form
+            const hiddenComment = form.querySelector('input[name="comment"]');
+            if (hiddenComment) {
+                hiddenComment.value = commentValue;
+            }
+            return true;
+        }
     </script>
 </body>
 </html>
