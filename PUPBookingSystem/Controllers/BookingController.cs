@@ -103,7 +103,7 @@ namespace PUPBookingSystem.Controllers
 
         }
 
-        // ... inside BookingController class ...
+       
 
         // GET: View Schedule for a specific room
         [HttpGet]
@@ -125,7 +125,7 @@ namespace PUPBookingSystem.Controllers
             return View(approvedBookings);
         }
 
-        // ... inside BookingController ...
+        
 
         // GET: Check availability via AJAX
         [HttpGet]
