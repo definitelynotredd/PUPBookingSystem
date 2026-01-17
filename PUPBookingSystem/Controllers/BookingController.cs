@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace PUPBookingSystem.Controllers
 {
-    [Authorize] // <--- RESTORED: This locks the whole section. Simple and reliable.
+    [Authorize] 
     public class BookingController : Controller
     {
         private readonly AppDbContext _context;

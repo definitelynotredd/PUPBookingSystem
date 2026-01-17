@@ -12,7 +12,7 @@ namespace PUPBookingSystem.Controllers
         {
             // If the user is ALREADY logged in, we might want to 
             // redirect them straight to the Booking Dashboard instead of the landing page.
-            if (User.Identity.IsAuthenticated)
+            if (User.Identity?.IsAuthenticated == true)
             {
                 if (User.IsInRole("Admin"))
                 {

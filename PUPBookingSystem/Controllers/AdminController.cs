@@ -6,7 +6,7 @@ using PUPBookingSystem.Data;
 
 namespace PUPBookingSystem.Controllers
 {
-    // [Authorize(Roles = "Admin")] // <-- Keep this commented out while testing!
+    // [Authorize(Roles = "Admin")] 
     public class AdminController : Controller
     {
         private readonly AppDbContext _context;
@@ -36,11 +36,11 @@ namespace PUPBookingSystem.Controllers
                 case "rejected":
                     query = query.Where(b => b.Status == "Rejected");
                     break;
-                default: // "all"
+                default: 
                     break;
             }
 
-            // Sort by Date (Newest first)
+            // Sort by Date 
             var requests = await query
                 .OrderByDescending(b => b.Date)
                 .ThenBy(b => b.StartTime)
@@ -65,7 +65,7 @@ namespace PUPBookingSystem.Controllers
             return RedirectToAction("Index");
         }
 
-        // UPGRADE: Temporarily removed 'reason' to match the simple Reject button in the UI
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Reject(int id)
@@ -87,19 +87,20 @@ namespace PUPBookingSystem.Controllers
                 .Include(b => b.Room)
                 .Include(b => b.User)
                 .Where(b => b.Status == "Approved")
+                .AsEnumerable() // Switch to client-side evaluation
                 .Select(b => new
                 {
                     id = b.Id,
                     title = b.Purpose,
-                    room = b.Room.Code,
+                    room = b.Room?.Code ?? "N/A",
                     date = b.Date.ToString("yyyy-MM-dd"),
                     start = DateTime.Today.Add(b.StartTime).ToString("hh:mm tt"),
                     end = DateTime.Today.Add(b.EndTime).ToString("hh:mm tt"),
-                    userName = b.User.Name
+                    userName = b.User?.Name ?? "Unknown"
                 })
                 .ToList();
 
-            // Pass data to view using ViewBag to serialize it later
+            // Pass data to view using ViewBag 
             ViewBag.Bookings = bookings;
 
             return View();
